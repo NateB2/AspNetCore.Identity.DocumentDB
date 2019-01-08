@@ -9,7 +9,7 @@
     <AssemblyName>AspNetCore.Identity.DocumentDB</AssemblyName>
     <PackageId>AspNetCore.Identity.DocumentDB</PackageId>
     <PackageTags>AspNetCore;Azure;CosmosDB;DocumentDB;identity;membership;partitioning</PackageTags>
-    <PackageReleaseNotes>- replaced DocumentClient with IDocumentClient in all RegisterDocumentDBStores & AddIdentityWithDocumentDBStores methods
+    <PackageReleaseNotes>- replaced DocumentClient with IDocumentClient in all RegisterDocumentDBStores and AddIdentityWithDocumentDBStores methods
     </PackageReleaseNotes>
     <PackageIconUrl>https://raw.githubusercontent.com/FelschR/AspNetCore.Identity.DocumentDB/netcore/imgs/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/FelschR/AspNetCore.Identity.DocumentDB</PackageProjectUrl>
