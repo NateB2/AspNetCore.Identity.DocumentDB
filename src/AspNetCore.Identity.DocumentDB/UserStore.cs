@@ -32,11 +32,11 @@ namespace Microsoft.AspNetCore.Identity.DocumentDB
             IUserAuthenticationTokenStore<TUser>
         where TUser : IdentityUser
     {
-        private readonly DocumentClient _Client;
+        private readonly IDocumentClient _Client;
         private readonly DocumentCollection _Users; // DocumentCollection of TUser
         private readonly bool UsesPartitioning;
 
-        public UserStore(DocumentClient documentClient, DocumentCollection users) // DocumentCollection of TUser
+        public UserStore(IDocumentClient documentClient, DocumentCollection users) // DocumentCollection of TUser
         {
             _Client = documentClient;
             _Users = users;
