@@ -2,15 +2,14 @@
 
   <PropertyGroup>
     <Description>A DocumentDB (Cosmos DB) provider for ASP.NET Core Identity framework with support for partitioning.</Description>
-    <VersionPrefix>2.0.0-beta4</VersionPrefix>
+    <VersionPrefix>2.0.0-beta5</VersionPrefix>
     <Authors>Felix Schröter</Authors>
     <TargetFrameworks>net451;netstandard1.6;netstandard2.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <AssemblyName>AspNetCore.Identity.DocumentDB</AssemblyName>
     <PackageId>AspNetCore.Identity.DocumentDB</PackageId>
     <PackageTags>AspNetCore;Azure;CosmosDB;DocumentDB;identity;membership;partitioning</PackageTags>
-    <PackageReleaseNotes>- fixed issue when setting email and username to the same value
-  - this change breaks compatibility with older versions due to email and username mapping documents being stored with different ids now
+    <PackageReleaseNotes>- replaced DocumentClient with IDocumentClient in all RegisterDocumentDBStores and AddIdentityWithDocumentDBStores methods
     </PackageReleaseNotes>
     <PackageIconUrl>https://raw.githubusercontent.com/FelschR/AspNetCore.Identity.DocumentDB/netcore/imgs/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/FelschR/AspNetCore.Identity.DocumentDB</PackageProjectUrl>
