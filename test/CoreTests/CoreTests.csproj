@@ -30,7 +30,6 @@
   </ItemGroup>
   <ItemGroup Condition=" '$(TargetFramework)' == 'netcoreapp2.0' ">
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.0.0" />
-    <PackageReference Include="Microsoft.Extensions.Logging" Version="2.0.0" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\AspNetCore.Identity.DocumentDB\AspNetCore.Identity.DocumentDB.csproj" />
