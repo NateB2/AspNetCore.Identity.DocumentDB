@@ -2,14 +2,15 @@
 
   <PropertyGroup>
     <Description>A DocumentDB (Cosmos DB) provider for ASP.NET Core Identity framework with support for partitioning.</Description>
-    <VersionPrefix>2.0.0-beta5</VersionPrefix>
+    <VersionPrefix>2.0.0-beta6</VersionPrefix>
     <Authors>Felix Schröter</Authors>
     <TargetFrameworks>net451;netstandard1.6;netstandard2.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <AssemblyName>AspNetCore.Identity.DocumentDB</AssemblyName>
     <PackageId>AspNetCore.Identity.DocumentDB</PackageId>
     <PackageTags>AspNetCore;Azure;CosmosDB;DocumentDB;identity;membership;partitioning</PackageTags>
-    <PackageReleaseNotes>- replaced DocumentClient with IDocumentClient in all RegisterDocumentDBStores and AddIdentityWithDocumentDBStores methods
+    <PackageReleaseNotes>- add 32 bit support via "Any CPU" platform target
+- update minimum dependency versions for security
     </PackageReleaseNotes>
     <PackageIconUrl>https://raw.githubusercontent.com/FelschR/AspNetCore.Identity.DocumentDB/netcore/imgs/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/FelschR/AspNetCore.Identity.DocumentDB</PackageProjectUrl>
