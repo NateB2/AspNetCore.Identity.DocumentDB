@@ -52,20 +52,20 @@ namespace Microsoft.AspNetCore.Identity.DocumentDB
         {
             if (UsesPartitioning)
             {
-                user.UserId = user.DocId ?? Guid.NewGuid().ToString();
+                user.PartitionKey = user.DocId ?? Guid.NewGuid().ToString();
                 user.DocId = "user";
             }
 
             var result = await _Client.CreateDocumentAsync(_Users.DocumentsLink, user);
             var userResult = (TUser)(dynamic)result.Resource;
             user.DocId = userResult.DocId;
-            user.UserId = userResult.UserId;
+            user.PartitionKey = userResult.PartitionKey;
             user.ResourceId = userResult.ResourceId;
 
             if (UsesPartitioning)
             {
-                await CreateMapping(user.NormalizedUserName, user.UserId, TypeEnum.UserMappingUsername);
-                await CreateMapping(user.NormalizedEmail, user.UserId, TypeEnum.UserMappingEmail);
+                await CreateMapping(user.NormalizedUserName, user.PartitionKey, TypeEnum.UserMappingUsername);
+                await CreateMapping(user.NormalizedEmail, user.PartitionKey, TypeEnum.UserMappingEmail);
             }
 
             return IdentityResult.Success;
@@ -73,20 +73,20 @@ namespace Microsoft.AspNetCore.Identity.DocumentDB
 
         public virtual async Task<IdentityResult> UpdateAsync(TUser user, CancellationToken token)
         {
-            var oldUser = await FindByIdAsync(user.UserId, token);
+            var oldUser = await FindByIdAsync(user.PartitionKey, token);
 
             if (UsesPartitioning)
             {
                 if (oldUser.NormalizedUserName != user.NormalizedUserName)
                 {
                     await DeleteMapping(oldUser.NormalizedUserName, TypeEnum.UserMappingUsername);
-                    await CreateMapping(user.NormalizedUserName, user.UserId, TypeEnum.UserMappingUsername);
+                    await CreateMapping(user.NormalizedUserName, user.PartitionKey, TypeEnum.UserMappingUsername);
                 }
 
                 if (oldUser.NormalizedEmail != user.NormalizedEmail)
                 {
                     await DeleteMapping(oldUser.NormalizedEmail, TypeEnum.UserMappingEmail);
-                    await CreateMapping(user.NormalizedEmail, user.UserId, TypeEnum.UserMappingEmail);
+                    await CreateMapping(user.NormalizedEmail, user.PartitionKey, TypeEnum.UserMappingEmail);
                 }
             }
 
@@ -108,7 +108,7 @@ namespace Microsoft.AspNetCore.Identity.DocumentDB
                     return DeleteMapping(partitionKey);
                 }));*/
             }
-            await _Client.DeleteDocumentAsync(GetUserUri(user), GetRequestOptions(user.UserId));
+            await _Client.DeleteDocumentAsync(GetUserUri(user), GetRequestOptions(user.PartitionKey));
 
             // todo success based on delete result
             return IdentityResult.Success;

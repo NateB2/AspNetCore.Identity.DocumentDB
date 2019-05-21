@@ -15,11 +15,11 @@
         }
 
         [JsonIgnore]
-        public override string Id { get { return UserId ?? DocId; } set { DocId = value; } }
+        public override string Id { get => PartitionKey ?? DocId; set => DocId = value; }
 
         // TODO make the field name "partition" configurable
         [JsonProperty("partition", NullValueHandling = NullValueHandling.Ignore)]
-        internal virtual string UserId { get; set; }
+        public virtual string PartitionKey { get; internal set; }
 
         [JsonProperty(PropertyName = "id")]
         internal string DocId { get; set; }
