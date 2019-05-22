@@ -9,8 +9,8 @@ matrix:
     mono: none
     sudo: required
     dotnet:
-    - 1.0
-    - 2.2
+    - 1.1.14
+    - 2.2.300
   - os: windows
     language: minimal
 
