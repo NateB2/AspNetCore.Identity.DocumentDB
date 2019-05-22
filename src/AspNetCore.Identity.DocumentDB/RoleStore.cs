@@ -44,19 +44,19 @@ namespace Microsoft.AspNetCore.Identity.DocumentDB
         {
             if (UsesPartitioning)
             {
-                role.RoleId = role.DocId ?? Guid.NewGuid().ToString();
+                role.PartitionKey = role.DocId ?? Guid.NewGuid().ToString();
                 role.DocId = "role";
             }
 
             var result = await _Client.CreateDocumentAsync(_Roles.DocumentsLink, role);
             var roleResult = (TRole)(dynamic)result.Resource;
             role.DocId = roleResult.DocId;
-            role.RoleId = roleResult.RoleId;
+            role.PartitionKey = roleResult.PartitionKey;
             role.ResourceId = roleResult.ResourceId;
 
             if (UsesPartitioning)
             {
-                await CreateMapping(role.NormalizedName, role.RoleId);
+                await CreateMapping(role.NormalizedName, role.PartitionKey);
             }
 
             return IdentityResult.Success;
@@ -69,7 +69,7 @@ namespace Microsoft.AspNetCore.Identity.DocumentDB
             if (UsesPartitioning && oldRole.NormalizedName != role.NormalizedName)
             {
                 await DeleteMapping(oldRole.NormalizedName);
-                await CreateMapping(role.NormalizedName, role.RoleId);
+                await CreateMapping(role.NormalizedName, role.PartitionKey);
             }
 
             var result = await _Client.ReplaceDocumentAsync(GetRoleUri(role.DocId), role);
@@ -84,7 +84,7 @@ namespace Microsoft.AspNetCore.Identity.DocumentDB
             {
                 await DeleteMapping(role.NormalizedName);
             }
-            await _Client.DeleteDocumentAsync(GetRoleUri(role.DocId), GetRequestOptions(role.RoleId));
+            await _Client.DeleteDocumentAsync(GetRoleUri(role.DocId), GetRequestOptions(role.PartitionKey));
 
             // todo low priority result based on delete result
             return IdentityResult.Success;
