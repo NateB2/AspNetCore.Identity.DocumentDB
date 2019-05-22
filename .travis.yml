@@ -60,12 +60,12 @@ script:
       ./src/AspNetCore.Identity.DocumentDB/AspNetCore.Identity.DocumentDB.csproj
     dotnet test \
       --configuration $CONFIGURATION \
-      --framework netstandard1.6 \
+      --framework netcoreapp1.0 \
       --filter Category!=BreaksUnix \
       ./test/CoreTests/CoreTests.csproj
     dotnet test \
       --configuration $CONFIGURATION \
-      --framework netstandard2.0 \
+      --framework netcoreapp2.0 \
       --filter Category!=BreaksUnix \
       ./test/CoreTests/CoreTests.csproj
   fi
