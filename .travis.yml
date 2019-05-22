@@ -39,12 +39,35 @@ before_install:
 script:
 - SUFFIX=$(if [ "$TRAVIS_BRANCH" = "netcore" ]; then echo ""; else echo $TRAVIS_BUILD_ID; fi)
 - dotnet restore --verbosity Minimal
-- dotnet build --configuration $CONFIGURATION --version-suffix $SUFFIX ./src/AspNetCore.Identity.DocumentDB/AspNetCore.Identity.DocumentDB.csproj
 - |
   if [ "$TRAVIS_OS_NAME" = "windows" ]; then
-    dotnet test --configuation $CONFIGURATION
+    dotnet build
+      --configuration $CONFIGURATION
+      --version-suffix $SUFFIX
+      ./src/AspNetCore.Identity.DocumentDB/AspNetCore.Identity.DocumentDB.csproj
+    dotnet test
+      --configuration $CONFIGURATION
   elif [ "$TRAVIS_OS_NAME" = "linux" ]; then
-    dotnet test --configuration $CONFIGURATION --filter Category!=BreaksUnix ./test/CoreTests/CoreTests.csproj
+    dotnet build
+      --configuration $CONFIGURATION
+      --framework netstandard1.6
+      --version-suffix $SUFFIX
+      ./src/AspNetCore.Identity.DocumentDB/AspNetCore.Identity.DocumentDB.csproj
+    dotnet build
+      --configuration $CONFIGURATION
+      --framework netstandard2.0
+      --version-suffix $SUFFIX
+      ./src/AspNetCore.Identity.DocumentDB/AspNetCore.Identity.DocumentDB.csproj
+    dotnet test
+      --configuration $CONFIGURATION
+      --framework netstandard1.6
+      --filter Category!=BreaksUnix
+      ./test/CoreTests/CoreTests.csproj
+    dotnet test
+      --configuration $CONFIGURATION
+      --framework netstandard2.0
+      --filter Category!=BreaksUnix
+      ./test/CoreTests/CoreTests.csproj
   fi
 
 after_success:
