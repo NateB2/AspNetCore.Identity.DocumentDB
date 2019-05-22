@@ -1,18 +1,14 @@
 if: tag IS NOT present
 
-language: csharp
 
 matrix:
   include:
   - os: linux
     dist: xenial
-    mono: none
     sudo: required
-    dotnet:
-    - 1.1
-    - 2.2
+    dotnet: 1.1
   - os: windows
-    language: minimal
+    language: bash 
 
 env:
   matrix:
@@ -37,6 +33,11 @@ before_install:
     powershell -Command {msiexec.exe /i C:\CosmosDB.Emulator.msi /quiet /qn /log install.log}
     powershell -Command {Get-Content install.log}
     powershell -Command {& "${env:ProgramFiles}\Azure Cosmos DB Emulator\CosmosDB.Emulator.exe"}
+  elif [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
+    sudo dpkg -i packages-microsoft-prod.deb
+    sudo apt-get update -q
+    sudo apt-get install apt-transport-https dotnet-sdk-2.2 -y
   fi
 
 script:
