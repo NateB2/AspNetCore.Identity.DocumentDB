@@ -1,63 +1,77 @@
-# only build changes tagged previously by AppVeyor build and pull requests
-if: tag IS present OR type = pull_request
+if: tag IS NOT present
 
 language: csharp
 
 matrix:
   include:
   - os: linux
+    dist: xenial
     mono: none
-    dist: trusty
     sudo: required
-    env: CONFIGURATION=Release LIB_FRAMEWORK=netstandard2.0 TEST_FRAMEWORK=netcoreapp2.0
     dotnet: 2.0.0
+  - os: windows
+    language: minimal
+
+env:
+  matrix:
+  - CONFIGURATION=Release
+  global:
+    secure: dpeEcxAWe+DdRp2uHGvtzIUF/4acQDSeAeAXBbqY4WL7b1uTJJxS3bHiZyClYLgneJk09Ys4MfpJkow8v4bPpr0ynioA+PN4TKSgxexGoxX7k4zrb0SuzyHY8WIcWouZd0uBQrmamLQ95zT8afMlvWGEhYRg88kBdRhNM0lNHrQAgM1de+/1vJatiB/JtyGkkAIgWTjlt55pelUxkmTjWx9PXStC76ChUKmtOT+L+cb15h6wcMO9gBkWIgKDbMIhENdKkamZIKwF1sQG5dI5wH2OHm1Xe7CFBV9PQtrbhBS8qAN2JEMLFg6laYWnbm15q0EhY28IlYwZCQIOZPIMs9zu8x4WRph/CKGBcvKV0cRQRflYRdIakVzevrmH0bylUepOzdOTR0e4s53//QBeqY/HOX+Hvubf7ddtCQKvTeZ0sZzKH+maQiUPsnOfr5jBWZrzUX/oHyfriVFAk5aBRyo0GZ6H19LcY9+p7DeQGI3rsFdh0COrH4NXSp4+rZzGH9Lc8kqu+IT92BWfoYdQGmHiajUaKLeSJduLJKkpZYG+wPtvDmQpSbMLECkPlGfVz39u7dCekclxio6N8ps+6HRiKS8VBTTAEFYFvyRVrkivSZbma10LOnUFB3Ea6cAgT3BgxnUZZ/2MCmx6h1SRuO8yBPVuq7ury1xbllxQKwk=
+
 addons:
   apt:
     packages:
-      - xmlstarlet
+    - xmlstarlet
+
+before_install:
+- |
+  if [ "$TRAVIS_OS_NAME" = "windows" ]; then
+    choco install xmlstarlet;
+    choco install dotnetcore-sdk;
+    # install Cosmos DB Emulator
+    powershell -Command {Start-FileDownload 'https://aka.ms/cosmosdb-emulator' -FileName 'C:\CosmosDB.Emulator.msi'}
+    msiexec.exe /i C:\CosmosDB.Emulator.msi /quiet /qn /log install.log
+    powershell -Command {msiexec.exe /i C:\CosmosDB.Emulator.msi /quiet /qn /log install.log}
+    powershell -Command {Get-Content install.log}
+    powershell -Command {& "${env:ProgramFiles}\Azure Cosmos DB Emulator\CosmosDB.Emulator.exe"}
+  fi
 
 script:
+- SUFFIX=$(if [ "$TRAVIS_BRANCH" = "netcore" ]; then echo ""; else echo $TRAVIS_BUILD_ID; fi)
 - dotnet restore --verbosity Minimal
-- dotnet build
-    --configuration $CONFIGURATION
-    --framework $LIB_FRAMEWORK
-    --version-suffix $TRAVIS_BUILD_ID
-    ./src/AspNetCore.Identity.DocumentDB/AspNetCore.Identity.DocumentDB.csproj
-- dotnet test
-    --configuration $CONFIGURATION
-    --framework $TEST_FRAMEWORK
-    --filter Category!=BreaksUnix
-    ./test/CoreTests/CoreTests.csproj
-# TODO: uncomment the following to enable integration tests
-#       when DocDB emulator is available on Unix. Currently,
-#       all tests are failing.
-#- dotnet test
-#    --configuration $CONFIGURATION
-#    --framework $TEST_FRAMEWORK
-#    ./test/CoreIntegrationTests/CoreIntegrationTests.csproj
+- dotnet build --configuration $CONFIGURATION --version-suffix $SUFFIX ./src/AspNetCore.Identity.DocumentDB/AspNetCore.Identity.DocumentDB.csproj
+- |
+  if [ "$TRAVIS_OS_NAME" = "windows" ]; then
+    dotnet test --configuation $CONFIGURATION
+  elif [ "$TRAVIS_OS_NAME" = "linux" ]; then
+    dotnet test --configuration $CONFIGURATION --filter Category!=BreaksUnix ./test/CoreTests/CoreTests.csproj
+  fi
 
 after_success:
-- dotnet pack
-    --configuration $CONFIGURATION
-    --framework $LIB_FRAMEWORK
-    --output ./artifacts
-    --version-suffix $TRAVIS_BUILD_ID
-    ./src/AspNetCore.Identity.DocumentDB
+- dotnet pack --configuration $CONFIGURATION --output ./artifacts --no-build ./src/AspNetCore.Identity.DocumentDB
 
 before_deploy:
-  - git config --global user.email "travis@felschr.com"
-  - git config --global user.name "Travis CI"
-  - GIT_TAG=($(xmlstarlet sel -t -m "/Project/PropertyGroup/VersionPrefix" -v . src/AspNetCore.Identity.DocumentDB/AspNetCore.Identity.DocumentDB.csproj))
-  - GIT_TAG=${GIT_TAG::-1}$TRAVIS_BUILD_NUMBER
-  - git tag $GIT_TAG -a -m "[skip ci] Generated tag from TravisCI for build $TRAVIS_BUILD_NUMBER"
-  - git push -q https://$TAGPERM@github.com/FelschR/AspNetCore.Identity.DocumentDB.git --tags
-  - ls -R
+- git config --global user.email "travis@felschr.com"
+- git config --global user.name "Travis CI"
+- GIT_TAG=($(xmlstarlet sel -t -m "/Project/PropertyGroup/VersionPrefix" -v . src/AspNetCore.Identity.DocumentDB/AspNetCore.Identity.DocumentDB.csproj))
+- GIT_TAG=${GIT_TAG::-1}$SUFFIX
+- git tag $GIT_TAG -a -m "[skip ci] Generated tag from TravisCI for build $TRAVIS_BUILD_NUMBER"
+- git push -q https://$TAGPERM@github.com/FelschR/AspNetCore.Identity.DocumentDB.git --tags
+- ls -R
 
 deploy:
-  provider: releases
+- provider: releases
   api_key:
     secure: oMWZEelU7ZF9Igc9aDPkxxO9PdBrnw0BNwJsatwcDl/2xj0jjEh90O3XohL0JV8/ AeUGvbn9vT55PBDo2As1DiWD+pfpkYhr0R2gUd43W9ewtS0/UlN7RRAYYuzYPEP4BqGVkphm21e0McPUjUUXGuGvQFHuala18htF9qw0QkHwDdZTXNgbKy+Vsx1ogrixXdDbjg5gW/a+4FzfqC1Xz0pzRcn+MzWbNg1eyB83CdEFyc0rCa1mzjUiHmviqkMk772kwR0y52l7yCMjErLcy7ZOweZaHExI8T9x0svNkDJCJ6PeRYJqlIb4J/bWfi09925Q61EDlADMiBkzI8iIxii0ijFs/r0iGo+orgmmkyzIOkiNe4RG8jg+7/hBblgerXTEHn/iy56aH+kJQSHoxv03XvsL1mbEnozyIEKzeDKbKNjLOqiAFhMgLCvouFtgoW+/IiYHxCF2r8Nm+qN9Vrny+tNaJJ4Rj/VnlHOuAuG2NjdtBsDjswUR55qFnTQObzT8vbaSGDfYs4SjWEeL7myt/phE36vnuR+mz4O3+0fxa8P2JLrUllQGBRaAWSqpn8/cnSnHM+vuURCNpSaHei3emNwyrqdazwpiM0n//NEMSdhmh43n4ujwpDdTjRgxJQbvI6izZbIc0DKLjehznwNm4NYwhap6IHBvzwDGb3zVdLaXUanZ1CI+UEfE/P/Rx4a8eN3BBe/0vHw1DKv8u43AfxqKxW9N6qqauMhDmiQ=
-  file: "artifacts/AspNetCore.Identity.DocumentDB.*.nupkg"
+  file: artifacts/AspNetCore.Identity.DocumentDB.*.nupkg
   skip_cleanup: true
   on:
+    branch: netcore
     tags: false
+    condition: '"$TRAVIS_OS_NAME" = "windows"'
+- provider: script
+  script: dotnet nuget push artifacts/AspNetCore.Identity.DocumentDB.*.nupkg --api-key $NUGET_API_KEY
+  on:
+    branch: netcore
+    tags: false
+    condition: '"$TRAVIS_OS_NAME" = "windows"'
