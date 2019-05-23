@@ -5,9 +5,7 @@ matrix:
   - os: linux
     dist: xenial
     sudo: required
-    language: csharp
-    mono: none
-    dotnet: 1.1
+    language: minimal 
   - os: windows
     language: bash 
 
@@ -38,7 +36,7 @@ before_install:
     wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
     sudo dpkg -i packages-microsoft-prod.deb
     sudo apt-get update -q
-    sudo apt-get install apt-transport-https dotnet-sdk-2.2 -y
+    sudo apt-get install apt-transport-https dotnet-dev-1.1.14 dotnet-sdk-2.2 -y
   fi
 
 script:
