@@ -27,11 +27,11 @@ before_install:
     choco install dotnetcore-sdk --version 1.1.14 -my
     choco install dotnetcore-sdk --version 2.2.300 -my
     # install Cosmos DB Emulator
-    powershell -Command {Start-FileDownload 'https://aka.ms/cosmosdb-emulator' -FileName 'C:\CosmosDB.Emulator.msi'}
-    msiexec.exe /i C:\CosmosDB.Emulator.msi /quiet /qn /log install.log
-    powershell -Command {msiexec.exe /i C:\CosmosDB.Emulator.msi /quiet /qn /log install.log}
-    powershell -Command {Get-Content install.log}
-    powershell -Command {& "${env:ProgramFiles}\Azure Cosmos DB Emulator\CosmosDB.Emulator.exe"}
+    curl https://aka.ms/cosmosdb-emulator -L -o CosmosDB.Emulator.msi
+    msiexec.exe /i CosmosDB.Emulator.msi /quiet /qn /log install.log
+    powershell -Command 'msiexec.exe /i C:\CosmosDB.Emulator.msi /quiet /qn /log install.log'
+    powershell -Command 'Get-Content install.log'
+    powershell -Command '& "${env:ProgramFiles}\Azure Cosmos DB Emulator\CosmosDB.Emulator.exe"'
   elif [ "$TRAVIS_OS_NAME" = "linux" ]; then
     wget -q https://packages.microsoft.com/config/ubuntu/16.04/packages-microsoft-prod.deb
     sudo dpkg -i packages-microsoft-prod.deb
