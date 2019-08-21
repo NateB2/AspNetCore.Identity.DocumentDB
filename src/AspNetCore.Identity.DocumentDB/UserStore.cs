@@ -1,5 +1,4 @@
-﻿
-#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
+﻿#pragma warning disable CS1998 // Async method lacks 'await' operators and will run synchronously
 // I'm using async methods to leverage implicit Task wrapping of results from expression bodied functions.
 
 namespace Microsoft.AspNetCore.Identity.DocumentDB
@@ -201,38 +200,39 @@ namespace Microsoft.AspNetCore.Identity.DocumentDB
         public virtual async Task<TUser> FindByLoginAsync(
             string loginProvider, string providerKey, CancellationToken cancellationToken = default(CancellationToken))
         {
-            if (UsesPartitioning)
-            {
-                throw new NotImplementedException("FindByLogin is not yet supported for partitioned collections.");
+            //if (UsesPartitioning)
+            //{
+            //throw new NotImplementedException("FindByLogin is not yet supported for partitioned collections.");
 
-                /* TODO: I have an idea for implementing this with paritioning support:
-                 * We need to store the logins as separate documents with their loginProvier + providerKey as partition key
-                 * and the corresponding IdentityUser ID.
-                 * In the IdentityUser we keep the Logins array but store the IDs (partition keys) of the logins.
-                 * Then we can query logins from the provider + key and we can get logins when we know the IdentityUser.
-                 * 
-                 * When returning the IdentityUser we always need to query the assigned logins as well.
-                 * IdentityUser: Create private Logins with IDs and JsonProperty and public Logins with actual Login objects and JsonIgnore.
-                 * 
-                 * Remember to also adjust the CreateAsync, UpdateAsync, DeleteAsync & AddLoginAsync methods.
-                 * /
+            /* TODO: I have an idea for implementing this with paritioning support:
+             * We need to store the logins as separate documents with their loginProvier + providerKey as partition key
+             * and the corresponding IdentityUser ID.
+             * In the IdentityUser we keep the Logins array but store the IDs (partition keys) of the logins.
+             * Then we can query logins from the provider + key and we can get logins when we know the IdentityUser.
+             *
+             * When returning the IdentityUser we always need to query the assigned logins as well.
+             * IdentityUser: Create private Logins with IDs and JsonProperty and public Logins with actual Login objects and JsonIgnore.
+             *
+             * Remember to also adjust the CreateAsync, UpdateAsync, DeleteAsync & AddLoginAsync methods.
+             * /
 
-                /*
-                var partitionKey = loginProvider + providerKey;
-                var partitionKeyMapping = _Client.CreateDocumentQuery<PartitionMapping>(_Users.DocumentsLink, GetFeedOptions(partitionKey))
-                    .Where(m => m.Id == partitionKey)
-                    .ToList().FirstOrDefault();
+            /*
+            var partitionKey = loginProvider + providerKey;
+            var partitionKeyMapping = _Client.CreateDocumentQuery<PartitionMapping>(_Users.DocumentsLink, GetFeedOptions(partitionKey))
+                .Where(m => m.Id == partitionKey)
+                .ToList().FirstOrDefault();
 
-                return _Client.CreateDocumentQuery<TUser>(_Users.DocumentsLink, GetFeedOptions(partitionKeyMapping.TargetId))
-                    .SelectMany(u => u.Logins.Where(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey).Select(u2 => u))
-                    .ToList().FirstOrDefault();
-                */
-            }
+            return _Client.CreateDocumentQuery<TUser>(_Users.DocumentsLink, GetFeedOptions(partitionKeyMapping.TargetId))
+                .SelectMany(u => u.Logins.Where(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey).Select(u2 => u))
+                .ToList().FirstOrDefault();
+            */
+            //}
 
-            return _Client.CreateDocumentQuery<TUser>(_Users.DocumentsLink)
+            return _Client.CreateDocumentQuery<TUser>(_Users.DocumentsLink, new FeedOptions() { EnableCrossPartitionQuery = true })
                 .SelectMany(u => u.Logins.Where(l => l.LoginProvider == loginProvider && l.ProviderKey == providerKey).Select(u2 => u))
                 .ToList().FirstOrDefault();
         }
+
         public virtual async Task SetSecurityStampAsync(TUser user, string stamp, CancellationToken token)
             => user.SecurityStamp = stamp;
 
@@ -251,7 +251,7 @@ namespace Microsoft.AspNetCore.Identity.DocumentDB
         public virtual async Task<string> GetEmailAsync(TUser user, CancellationToken token)
             => user.Email;
 
-        // note: no way to intergation test as this isn't used by Identity framework	
+        // note: no way to intergation test as this isn't used by Identity framework
         public virtual async Task<string> GetNormalizedEmailAsync(TUser user, CancellationToken cancellationToken)
             => user.NormalizedEmail;
 
@@ -392,7 +392,6 @@ namespace Microsoft.AspNetCore.Identity.DocumentDB
                     .Where(u => u.Type == TypeEnum.User).AsQueryable();
             }
         }
-            
 
         public virtual async Task SetTokenAsync(TUser user, string loginProvider, string name, string value, CancellationToken cancellationToken)
             => user.SetToken(loginProvider, name, value);

@@ -2,14 +2,15 @@
 
   <PropertyGroup>
     <Description>A DocumentDB (Cosmos DB) provider for ASP.NET Core Identity framework with support for partitioning.</Description>
-    <VersionPrefix>2.0.0-beta7</VersionPrefix>
+    <VersionPrefix>2.0.0.1-beta7</VersionPrefix>
     <Authors>Felix Schröter</Authors>
     <TargetFrameworks>net451;netstandard1.6;netstandard2.0</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
-    <AssemblyName>AspNetCore.Identity.DocumentDB</AssemblyName>
-    <PackageId>AspNetCore.Identity.DocumentDB</PackageId>
+    <AssemblyName>SureID.AspNetCore.Identity.DocumentDB</AssemblyName>
+    <PackageId>SureID.AspNetCore.Identity.DocumentDB</PackageId>
     <PackageTags>AspNetCore;Azure;CosmosDB;DocumentDB;identity;membership;partitioning</PackageTags>
-    <PackageReleaseNotes>- allow get access to PartitionKey on IdentityUser and IdentityRole (useful when querying based on partition key)
+    <PackageReleaseNotes>
+      - allow get access to PartitionKey on IdentityUser and IdentityRole (useful when querying based on partition key)
     </PackageReleaseNotes>
     <PackageIconUrl>https://raw.githubusercontent.com/FelschR/AspNetCore.Identity.DocumentDB/netcore/imgs/icon.png</PackageIconUrl>
     <PackageProjectUrl>https://github.com/FelschR/AspNetCore.Identity.DocumentDB</PackageProjectUrl>
@@ -39,5 +40,4 @@
   <ItemGroup Condition=" '$(TargetFramework)' == 'netstandard2.0' ">
     <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.0.4" />
   </ItemGroup>
-
 </Project>
