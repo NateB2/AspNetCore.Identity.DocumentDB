@@ -1,0 +1,70 @@
+
+pool:
+  name: SidAzure-Builds
+
+trigger:
+- master
+
+resources:
+  repositories:
+    - repository: templates
+      type: git
+      name: sureid_shared_libraries/YamlTemplates
+
+name: $(MajorVersion).$(MinorVersion).$(Year:yy)$(DayOfYear).$(Build.BuildId)
+
+variables:
+  BuildConfiguration: 'Release'
+  MajorVersion: 1
+  MinorVersion: 0      
+steps:
+- checkout: self
+  clean: true
+
+- template: build/DotNetCore-RestoreNugetPackages.yaml@templates
+
+- template: build/DotNetCore22-BuildAndTest.yaml@templates
+  parameters:
+    buildConfiguration: '$(BuildConfiguration)'
+    dotNetTestArguments: '--configuration $(BuildConfiguration) --collect "Code Coverage"'
+
+- task: PublishSymbols@2
+  displayName: 'Publish symbols'
+  inputs:
+    SymbolServerType: TeamServices
+    DetailedLog: false
+    continueOnError: true
+  condition: and(succeeded(), eq(variables['ForcePush'],'true'))
+
+- task: DotNetCoreCLI@2
+  displayName: 'Pack prerelease Nuget packages'
+  inputs:
+    command: pack
+    packagesToPack: 'src/**/*.csproj'
+    packDirectory: '$(Build.ArtifactStagingDirectory)\nuget\packages'
+    versioningScheme: byPrereleaseNumber
+    majorVersion: '$(MajorVersion)'
+    minorVersion: '$(MinorVersion)'
+    patchVersion: '$(Build.BuildId)'
+    buildProperties: 'Copyright=$(Year:yyyy)'
+  condition: and(succeeded(), eq(variables['ForcePush'],'true'), ne(variables['Build.SourceBranch'], 'refs/heads/master'))    
+
+- task: DotNetCoreCLI@2
+  displayName: 'Nuget pack - production'
+  inputs:
+    command: pack
+    packagesToPack: 'src/**/*.csproj'
+    packDirectory: '$(Build.ArtifactStagingDirectory)\nuget\packages'
+    versioningScheme: byEnvVar
+    versionEnvVar: Build.BuildNumber
+    buildProperties: 'Copyright=$(Year:yyyy)'
+  condition: and(succeeded(), eq(variables['Build.SourceBranch'], 'refs/heads/master'))
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish Nuget packages'
+  inputs:
+    command: push
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/nuget/packages/*.nupkg'
+    publishVstsFeed: '0a18234a-0d3a-442b-8a61-ddc650ece3aa'
+    allowPackageConflicts: true
+  condition: and(succeeded(), eq(variables['ForcePush'],'true'))
