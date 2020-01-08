@@ -2,9 +2,9 @@
 
   <PropertyGroup>
     <Description>A DocumentDB (Cosmos DB) provider for ASP.NET Core Identity framework with support for partitioning.</Description>
-    <VersionPrefix>2.0.0.1-beta7</VersionPrefix>
+    <VersionPrefix>2.0.0.2-beta7</VersionPrefix>
     <Authors>Felix Schröter</Authors>
-    <TargetFrameworks>net451;netstandard1.6;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net451;netstandard1.6;netstandard2.0;netcoreapp3.1</TargetFrameworks>
     <WarningsAsErrors>true</WarningsAsErrors>
     <AssemblyName>SureID.AspNetCore.Identity.DocumentDB</AssemblyName>
     <PackageId>SureID.AspNetCore.Identity.DocumentDB</PackageId>
