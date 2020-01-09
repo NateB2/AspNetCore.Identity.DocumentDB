@@ -2,7 +2,7 @@
 {
     using System.Linq;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Identity.DocumentDB;
+    using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
     using Xunit;
     using System.Collections.Generic;
 
@@ -13,7 +13,7 @@
         public async Task GetRoles_UserHasNoRoles_ReturnsNoRoles()
         {
             var manager = GetUserManager();
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
 
             var roles = await manager.GetRolesAsync(user);
@@ -25,12 +25,12 @@
         public async Task AddRole_Adds()
         {
             var manager = GetUserManager();
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
 
             await manager.AddToRoleAsync(user, "role");
 
-            var savedUser = Client.CreateDocumentQuery<IdentityUser>(Users.DocumentsLink).AsEnumerable().FirstOrDefault();
+            var savedUser = Client.CreateDocumentQuery<DocDBIdentity.IdentityUser>(Users.DocumentsLink).AsEnumerable().FirstOrDefault();
             // note: addToRole now passes a normalized role name
             Assert.Equal(new List<string> { "ROLE" }, savedUser.Roles);
             Assert.True(await manager.IsInRoleAsync(user, "role"));
@@ -40,13 +40,13 @@
         public async Task RemoveRole_Removes()
         {
             var manager = GetUserManager();
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
             await manager.AddToRoleAsync(user, "role");
 
             await manager.RemoveFromRoleAsync(user, "role");
 
-            var savedUser = Client.CreateDocumentQuery<IdentityUser>(Users.DocumentsLink).AsEnumerable().FirstOrDefault();
+            var savedUser = Client.CreateDocumentQuery<DocDBIdentity.IdentityUser>(Users.DocumentsLink).AsEnumerable().FirstOrDefault();
             Assert.Empty(savedUser.Roles);
             Assert.False(await manager.IsInRoleAsync(user, "role"));
         }
@@ -56,8 +56,8 @@
         {
             var roleA = "roleA";
             var roleB = "roleB";
-            var userInA = new IdentityUser { UserName = "nameA" };
-            var userInB = new IdentityUser { UserName = "nameB" };
+            var userInA = new DocDBIdentity.IdentityUser { UserName = "nameA" };
+            var userInB = new DocDBIdentity.IdentityUser { UserName = "nameB" };
             var manager = GetUserManager();
             await manager.CreateAsync(userInA);
             await manager.CreateAsync(userInB);

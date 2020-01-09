@@ -1,18 +1,19 @@
 ﻿using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
+
 namespace IntegrationTests
 {
     using System;
+    using System.Linq;
+    using System.Net;
+    using System.Threading.Tasks;
     using Microsoft.AspNetCore.Builder;
     using Microsoft.AspNetCore.Identity;
-    using Microsoft.AspNetCore.Identity.DocumentDB;
-    using Microsoft.Extensions.DependencyInjection;
-    using Microsoft.Azure.Documents.Client;
-    using System.Linq;
     using Microsoft.Azure.Documents;
-    using System.Threading.Tasks;
-    using System.Net;
+    using Microsoft.Azure.Documents.Client;
+    using Microsoft.Extensions.DependencyInjection;
+    using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
 
     public class UserIntegrationTestsBase
     {
@@ -26,6 +27,7 @@ namespace IntegrationTests
 
         // Default settings to connect with DocumentDB Emulator:
         private const string endpointUrl = "https://localhost:8081";
+
         private const string primaryKey = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
         private static readonly string databaseName = "AspDotNetCore.Identity.DocumentDB.Test";
 
@@ -75,18 +77,18 @@ namespace IntegrationTests
             Users = await Client.CreateDocumentCollectionAsync(Database.SelfLink, collection);
             Roles = Users;
 
-            ServiceProvider = CreateServiceProvider<IdentityUser, IdentityRole>();
+            ServiceProvider = CreateServiceProvider<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>();
         }
 
-        protected UserManager<IdentityUser> GetUserManager()
-            => ServiceProvider.GetService<UserManager<IdentityUser>>();
+        protected UserManager<DocDBIdentity.IdentityUser> GetUserManager()
+            => ServiceProvider.GetService<UserManager<DocDBIdentity.IdentityUser>>();
 
-        protected RoleManager<IdentityRole> GetRoleManager()
-            => ServiceProvider.GetService<RoleManager<IdentityRole>>();
+        protected RoleManager<DocDBIdentity.IdentityRole> GetRoleManager()
+            => ServiceProvider.GetService<RoleManager<DocDBIdentity.IdentityRole>>();
 
         protected IServiceProvider CreateServiceProvider<TUser, TRole>(Action<IdentityOptions> optionsProvider = null)
-            where TUser : IdentityUser
-            where TRole : IdentityRole
+            where TUser : DocDBIdentity.IdentityUser
+            where TRole : DocDBIdentity.IdentityRole
         {
             var services = new ServiceCollection();
             optionsProvider = optionsProvider ?? (options => { });

@@ -4,10 +4,11 @@ using Microsoft.Extensions.Options;
 using Xunit;
 
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
+
 namespace CoreTests
 {
     using Microsoft.AspNetCore.Identity;
-    using Microsoft.AspNetCore.Identity.DocumentDB;
+    using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
     using Microsoft.Azure.Documents;
     using Microsoft.Azure.Documents.Client;
     using Microsoft.Extensions.DependencyInjection;
@@ -18,11 +19,11 @@ namespace CoreTests
 
     public class DocumentDBIdentityBuilderExtensionsTests
     {
-        static readonly string databaseId = "AspDotNetCore.Identity.DocumentDB.Test";
-        static readonly string collectionId = "Users.Collection.Test";
-        static readonly string key = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
+        private static readonly string databaseId = "AspDotNetCore.Identity.DocumentDB.Test";
+        private static readonly string collectionId = "Users.Collection.Test";
+        private static readonly string key = "C2y6yDjf5/R+ob0N8A7Cgv30VRDJIWEHLM+4QDU5DE2nQ9nDuVTqobD4b8mGGyPMbIZnqyMsEcaGQy67XIw/Jw==";
 
-        DocumentClient client = new DocumentClient(new Uri("https://localhost:8081"), key);
+        private DocumentClient client = new DocumentClient(new Uri("https://localhost:8081"), key);
 
         [Fact]
         [Trait("Category", "BreaksUnix")]
@@ -39,16 +40,16 @@ namespace CoreTests
             services.AddLogging();
 
             var provider = services.BuildServiceProvider();
-            var resolvedUserStore = provider.GetService<IUserStore<IdentityUser>>();
+            var resolvedUserStore = provider.GetService<IUserStore<DocDBIdentity.IdentityUser>>();
             Assert.NotNull(resolvedUserStore); // "User store did not resolve"
 
-            var resolvedRoleStore = provider.GetService<IRoleStore<IdentityRole>>();
+            var resolvedRoleStore = provider.GetService<IRoleStore<DocDBIdentity.IdentityRole>>();
             Assert.NotNull(resolvedRoleStore); // "Role store did not resolve"
 
-            var resolvedUserManager = provider.GetService<UserManager<IdentityUser>>();
+            var resolvedUserManager = provider.GetService<UserManager<DocDBIdentity.IdentityUser>>();
             Assert.NotNull(resolvedUserManager); // "User manager did not resolve"
 
-            var resolvedRoleManager = provider.GetService<RoleManager<IdentityRole>>();
+            var resolvedRoleManager = provider.GetService<RoleManager<DocDBIdentity.IdentityRole>>();
             Assert.NotNull(resolvedRoleManager); // "Role manager did not resolve"
         }
 
@@ -77,11 +78,11 @@ namespace CoreTests
             Assert.Equal(ClaimTypes.WindowsUserClaim, resolvedIdentOptions.Value.ClaimsIdentity.UserNameClaimType); // "Identity options are not set"
         }
 
-        protected class CustomUser : IdentityUser
+        protected class CustomUser : DocDBIdentity.IdentityUser
         {
         }
 
-        protected class CustomRole : IdentityRole
+        protected class CustomRole : DocDBIdentity.IdentityRole
         {
         }
 
@@ -125,8 +126,8 @@ namespace CoreTests
             var ex = Assert.Throws<ArgumentException>(() =>
             {
                 new ServiceCollection()
-                .AddIdentity<IdentityUser, IdentityRole>()
-                .RegisterDocumentDBStores<IdentityUser, IdentityRole>(options =>
+                .AddIdentity<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>()
+                .RegisterDocumentDBStores<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>(options =>
                 {
                     options.EnableDocumentDbEmulatorSupport();
                     options.CollectionId = collectionId;
@@ -135,11 +136,11 @@ namespace CoreTests
             Assert.Equal("DatabaseId cannot be null.", ex.Message);
         }
 
-        protected class WrongUser : IdentityUser
+        protected class WrongUser : DocDBIdentity.IdentityUser
         {
         }
 
-        protected class WrongRole : IdentityRole
+        protected class WrongRole : DocDBIdentity.IdentityRole
         {
         }
 
@@ -150,28 +151,28 @@ namespace CoreTests
             var ex = Assert.Throws<ArgumentException>(() =>
             {
                 new ServiceCollection()
-                    .AddIdentity<IdentityUser, IdentityRole>()
-                    .RegisterDocumentDBStores<WrongUser, IdentityRole>(options =>
+                    .AddIdentity<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>()
+                    .RegisterDocumentDBStores<WrongUser, DocDBIdentity.IdentityRole>(options =>
                     {
                         options.EnableDocumentDbEmulatorSupport();
                         options.DatabaseId = databaseId;
                         options.CollectionId = collectionId;
                     });
             });
-            Assert.Equal("User type passed to RegisterDocumentDBStores must match user type passed to AddIdentity. You passed Microsoft.AspNetCore.Identity.DocumentDB.IdentityUser to AddIdentity and CoreTests.DocumentDBIdentityBuilderExtensionsTests+WrongUser to RegisterDocumentDBStores, these do not match.", ex.Message);
+            Assert.Equal("User type passed to RegisterDocumentDBStores must match user type passed to AddIdentity. You passed Microsoft.AspNetCore.Identity.DocumentDB.DocDBIdentity.IdentityUser to AddIdentity and CoreTests.DocumentDBIdentityBuilderExtensionsTests+WrongUser to RegisterDocumentDBStores, these do not match.", ex.Message);
 
             var ex2 = Assert.Throws<ArgumentException>(() =>
             {
                 new ServiceCollection()
-                    .AddIdentity<IdentityUser, IdentityRole>()
-                    .RegisterDocumentDBStores<IdentityUser, WrongRole>(options =>
+                    .AddIdentity<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>()
+                    .RegisterDocumentDBStores<DocDBIdentity.IdentityUser, WrongRole>(options =>
                     {
                         options.EnableDocumentDbEmulatorSupport();
                         options.DatabaseId = databaseId;
                         options.CollectionId = collectionId;
                     });
             });
-            Assert.Equal("Role type passed to RegisterDocumentDBStores must match role type passed to AddIdentity. You passed Microsoft.AspNetCore.Identity.DocumentDB.IdentityRole to AddIdentity and CoreTests.DocumentDBIdentityBuilderExtensionsTests+WrongRole to RegisterDocumentDBStores, these do not match.", ex2.Message);
+            Assert.Equal("Role type passed to RegisterDocumentDBStores must match role type passed to AddIdentity. You passed Microsoft.AspNetCore.Identity.DocumentDB.DocDBIdentity.IdentityRole to AddIdentity and CoreTests.DocumentDBIdentityBuilderExtensionsTests+WrongRole to RegisterDocumentDBStores, these do not match.", ex2.Message);
         }
 
         [Fact]
@@ -181,7 +182,7 @@ namespace CoreTests
             var database = client.CreateDatabaseQuery().Where(db => db.Id.Equals(databaseId))
                 .AsEnumerable().FirstOrDefault();
 
-            // make sure the database does not exist 
+            // make sure the database does not exist
             if (database != null)
             {
                 database = await client.DeleteDatabaseAsync(database.SelfLink);
@@ -189,8 +190,8 @@ namespace CoreTests
 
             // when database does not exist does not throw:
             new ServiceCollection()
-                .AddIdentity<IdentityUser, IdentityRole>()
-                .RegisterDocumentDBStores<IdentityUser, IdentityRole>(options =>
+                .AddIdentity<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>()
+                .RegisterDocumentDBStores<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>(options =>
                 {
                     options.EnableDocumentDbEmulatorSupport();
                     options.DatabaseId = databaseId;
@@ -199,8 +200,8 @@ namespace CoreTests
 
             // when database exists does not throw:
             new ServiceCollection()
-                .AddIdentity<IdentityUser, IdentityRole>()
-                .RegisterDocumentDBStores<IdentityUser, IdentityRole>(options =>
+                .AddIdentity<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>()
+                .RegisterDocumentDBStores<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>(options =>
                 {
                     options.EnableDocumentDbEmulatorSupport();
                     options.DatabaseId = databaseId;
@@ -229,8 +230,8 @@ namespace CoreTests
 
             // when collection does not exist does not throw:
             new ServiceCollection()
-                .AddIdentity<IdentityUser, IdentityRole>()
-                .RegisterDocumentDBStores<IdentityUser, IdentityRole>(options =>
+                .AddIdentity<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>()
+                .RegisterDocumentDBStores<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>(options =>
                 {
                     options.EnableDocumentDbEmulatorSupport();
                     options.DatabaseId = databaseId;
@@ -239,8 +240,8 @@ namespace CoreTests
 
             // when collection exists does not throw:
             new ServiceCollection()
-                .AddIdentity<IdentityUser, IdentityRole>()
-                .RegisterDocumentDBStores<IdentityUser, IdentityRole>(options =>
+                .AddIdentity<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>()
+                .RegisterDocumentDBStores<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>(options =>
                 {
                     options.EnableDocumentDbEmulatorSupport();
                     options.DatabaseId = databaseId;

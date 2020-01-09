@@ -3,16 +3,16 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Identity;
-    using Microsoft.AspNetCore.Identity.DocumentDB;
+    using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
     using Microsoft.Extensions.DependencyInjection;
     using Xunit;
-    
+
     public class EnsureWeCanExtendIdentityRoleTests : UserIntegrationTestsBase
     {
         private RoleManager<ExtendedIdentityRole> _Manager;
         private ExtendedIdentityRole _Role;
 
-        public class ExtendedIdentityRole : IdentityRole
+        public class ExtendedIdentityRole : DocDBIdentity.IdentityRole
         {
             public string ExtendedField { get; set; }
         }
@@ -24,7 +24,7 @@
 
         public void BeforeEachTestAfterBase()
         {
-            _Manager = CreateServiceProvider<IdentityUser, ExtendedIdentityRole>()
+            _Manager = CreateServiceProvider<DocDBIdentity.IdentityUser, ExtendedIdentityRole>()
                 .GetService<RoleManager<ExtendedIdentityRole>>();
             _Role = new ExtendedIdentityRole
             {

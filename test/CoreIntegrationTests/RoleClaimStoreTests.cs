@@ -3,7 +3,7 @@
     using System.Linq;
     using System.Security.Claims;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Identity.DocumentDB;
+    using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
     using Xunit;
 
     public class RoleClaimStoreTests : UserIntegrationTestsBase
@@ -11,7 +11,7 @@
         [Fact]
         public async Task Create_NewRole_HasNoClaims()
         {
-            var role = new IdentityRole { Name = "name" };
+            var role = new DocDBIdentity.IdentityRole { Name = "name" };
             var manager = GetRoleManager();
             await manager.CreateAsync(role);
 
@@ -23,7 +23,7 @@
         [Fact]
         public async Task AddClaim_ReturnsClaim()
         {
-            var role = new IdentityRole { Name = "name" };
+            var role = new DocDBIdentity.IdentityRole { Name = "name" };
             var manager = GetRoleManager();
             await manager.CreateAsync(role);
 
@@ -37,7 +37,7 @@
         [Fact]
         public async Task RemoveClaim_RemovesExistingClaim()
         {
-            var role = new IdentityRole { Name = "name" };
+            var role = new DocDBIdentity.IdentityRole { Name = "name" };
             var manager = GetRoleManager();
             await manager.CreateAsync(role);
             await manager.AddClaimAsync(role, new Claim("type", "value"));
@@ -50,7 +50,7 @@
         [Fact]
         public async Task RemoveClaim_DifferentType_DoesNotRemoveClaim()
         {
-            var role = new IdentityRole { Name = "name" };
+            var role = new DocDBIdentity.IdentityRole { Name = "name" };
             var manager = GetRoleManager();
             await manager.CreateAsync(role);
             await manager.AddClaimAsync(role, new Claim("type", "value"));
@@ -63,7 +63,7 @@
         [Fact]
         public async Task RemoveClaim_DifferentValue_DoesNotRemoveClaim()
         {
-            var role = new IdentityRole { Name = "name" };
+            var role = new DocDBIdentity.IdentityRole { Name = "name" };
             var manager = GetRoleManager();
             await manager.CreateAsync(role);
             await manager.AddClaimAsync(role, new Claim("type", "value"));

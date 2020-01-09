@@ -2,7 +2,7 @@
 {
     using System.Linq;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Identity.DocumentDB;
+    using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
     using Xunit;
     using System;
 
@@ -13,12 +13,12 @@
         public async Task Create_NewUser_Saves()
         {
             var userName = "name";
-            var user = new IdentityUser { UserName = userName };
+            var user = new DocDBIdentity.IdentityUser { UserName = userName };
             var manager = GetUserManager();
 
             await manager.CreateAsync(user);
 
-            var savedUser = Client.CreateDocumentQuery<IdentityUser>(Users.DocumentsLink).AsEnumerable().FirstOrDefault();
+            var savedUser = Client.CreateDocumentQuery<DocDBIdentity.IdentityUser>(Users.DocumentsLink).AsEnumerable().FirstOrDefault();
             Assert.Equal(user.UserName, savedUser.UserName);
         }
 
@@ -26,7 +26,7 @@
         public async Task FindByName_SavedUser_ReturnsUser()
         {
             var userName = "name";
-            var user = new IdentityUser { UserName = userName };
+            var user = new DocDBIdentity.IdentityUser { UserName = userName };
             var manager = GetUserManager();
             await manager.CreateAsync(user);
 
@@ -50,7 +50,7 @@
         public async Task FindById_SavedUser_ReturnsUser()
         {
             var userId = Guid.NewGuid().ToString();
-            var user = new IdentityUser { UserName = "name" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "name" };
             user.Id = userId;
             var manager = GetUserManager();
             await manager.CreateAsync(user);
@@ -84,20 +84,20 @@
         [Fact]
         public async Task Delete_ExistingUser_Removes()
         {
-            var user = new IdentityUser { UserName = "name" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "name" };
             var manager = GetUserManager();
             await manager.CreateAsync(user);
-            Assert.NotEmpty(Client.CreateDocumentQuery<IdentityUser>(Users.DocumentsLink).AsEnumerable());
+            Assert.NotEmpty(Client.CreateDocumentQuery<DocDBIdentity.IdentityUser>(Users.DocumentsLink).AsEnumerable());
 
             await manager.DeleteAsync(user);
 
-            Assert.Empty(Client.CreateDocumentQuery<IdentityUser>(Users.DocumentsLink).AsEnumerable());
+            Assert.Empty(Client.CreateDocumentQuery<DocDBIdentity.IdentityUser>(Users.DocumentsLink).AsEnumerable());
         }
 
         [Fact]
         public async Task Update_ExistingUser_Updates()
         {
-            var user = new IdentityUser { UserName = "name" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "name" };
             var manager = GetUserManager();
             await manager.CreateAsync(user);
             var savedUser = await manager.FindByIdAsync(user.Id);
@@ -105,7 +105,7 @@
 
             await manager.UpdateAsync(savedUser);
 
-            var changedUser = Client.CreateDocumentQuery<IdentityUser>(Users.DocumentsLink).AsEnumerable().FirstOrDefault();
+            var changedUser = Client.CreateDocumentQuery<DocDBIdentity.IdentityUser>(Users.DocumentsLink).AsEnumerable().FirstOrDefault();
             Assert.NotNull(changedUser);
             Assert.Equal("newname", changedUser.UserName);
         }
@@ -113,7 +113,7 @@
         [Fact]
         public async Task SimpleAccessorsAndGetters()
         {
-            var user = new IdentityUser
+            var user = new DocDBIdentity.IdentityUser
             {
                 UserName = "username"
             };

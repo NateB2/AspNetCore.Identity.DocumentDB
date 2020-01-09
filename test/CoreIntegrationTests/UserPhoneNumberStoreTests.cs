@@ -1,7 +1,7 @@
 ﻿namespace IntegrationTests
 {
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Identity.DocumentDB;
+    using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
     using Xunit;
 
     // todo low - validate all tests work
@@ -12,7 +12,7 @@
         [Fact]
         public async Task SetPhoneNumber_StoresPhoneNumber()
         {
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             var manager = GetUserManager();
             await manager.CreateAsync(user);
 
@@ -24,7 +24,7 @@
         [Fact]
         public async Task ConfirmPhoneNumber_StoresPhoneNumberConfirmed()
         {
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             var manager = GetUserManager();
             await manager.CreateAsync(user);
             var token = await manager.GenerateChangePhoneNumberTokenAsync(user, PhoneNumber);
@@ -37,7 +37,7 @@
         [Fact]
         public async Task ChangePhoneNumber_OriginalPhoneNumberWasConfirmed_NotPhoneNumberConfirmed()
         {
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             var manager = GetUserManager();
             await manager.CreateAsync(user);
             var token = await manager.GenerateChangePhoneNumberTokenAsync(user, PhoneNumber);

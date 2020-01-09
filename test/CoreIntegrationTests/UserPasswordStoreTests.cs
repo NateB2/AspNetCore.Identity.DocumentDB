@@ -3,7 +3,7 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Identity;
-    using Microsoft.AspNetCore.Identity.DocumentDB;
+    using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
     using Microsoft.Extensions.DependencyInjection;
     using Xunit;
 
@@ -13,7 +13,7 @@
         [Fact]
         public async Task HasPassword_NoPassword_ReturnsFalse()
         {
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             var manager = GetUserManager();
             await manager.CreateAsync(user);
 
@@ -25,14 +25,14 @@
         [Fact]
         public async Task AddPassword_NewPassword_CanFindUserByPassword()
         {
-            var user = new IdentityUser { UserName = "bob" };
-            var manager = CreateServiceProvider<IdentityUser, IdentityRole>(options =>
-                {
-                    options.Password.RequireDigit = false;
-                    options.Password.RequireNonAlphanumeric = false;
-                    options.Password.RequireUppercase = false;
-                })
-                .GetService<UserManager<IdentityUser>>();
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
+            var manager = CreateServiceProvider<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>(options =>
+                 {
+                     options.Password.RequireDigit = false;
+                     options.Password.RequireNonAlphanumeric = false;
+                     options.Password.RequireUppercase = false;
+                 })
+                .GetService<UserManager<DocDBIdentity.IdentityUser>>();
             await manager.CreateAsync(user);
 
             var result = await manager.AddPasswordAsync(user, "testtest");
@@ -47,14 +47,14 @@
         [Fact]
         public async Task RemovePassword_UserWithPassword_SetsPasswordNull()
         {
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             var manager = GetUserManager();
             await manager.CreateAsync(user);
             await manager.AddPasswordAsync(user, "testtest");
 
             await manager.RemovePasswordAsync(user);
 
-            var savedUser = Client.CreateDocumentQuery<IdentityUser>(Users.DocumentsLink).AsEnumerable().FirstOrDefault();
+            var savedUser = Client.CreateDocumentQuery<DocDBIdentity.IdentityUser>(Users.DocumentsLink).AsEnumerable().FirstOrDefault();
             Assert.Null(savedUser.PasswordHash);
         }
     }

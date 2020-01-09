@@ -1,7 +1,7 @@
 ﻿namespace IntegrationTests
 {
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Identity.DocumentDB;
+    using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
     using Xunit;
     using System.Security.Claims;
 
@@ -12,7 +12,7 @@
         public async Task GetClaims_UserHasNoRoles_UserHasNoClaims_ReturnsNoClaims()
         {
             var manager = GetUserManager();
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
 
             var claims = await manager.GetClaimsAsync(user);
@@ -24,7 +24,7 @@
         public async Task GetClaims_UserHasRoles_UserHasNoRoleClaims_ReturnsNoClaims()
         {
             var manager = GetUserManager();
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
 
             await manager.AddToRoleAsync(user, "role");

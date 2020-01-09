@@ -1,13 +1,12 @@
 ﻿// ReSharper disable once CheckNamespace - Common convention to locate extensions in Microsoft namespaces for simplifying autocompletion as a consumer.
 
-using System.Diagnostics.CodeAnalysis;
 using System;
-using System.Linq;
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.DocumentDB;
+using DocDbIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 
@@ -25,9 +24,9 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="collectionFactory">Function containing DocumentCollection</param>
         public static IdentityBuilder RegisterDocumentDBStores(
             this IdentityBuilder builder,
-            Action<DocumentDbOptions> documentDbOptions)
+            Action<DocDbIdentity.DocumentDbOptions> documentDbOptions)
         {
-            return RegisterDocumentDBStores<IdentityUser, IdentityRole>(builder, documentDbOptions);
+            return RegisterDocumentDBStores<DocDbIdentity.IdentityUser, DocDbIdentity.IdentityRole>(builder, documentDbOptions);
         }
 
         /// <summary>
@@ -39,11 +38,11 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <param name="collectionFactory">Function containing DocumentCollection</param>
         public static IdentityBuilder RegisterDocumentDBStores<TUser, TRole>(
             this IdentityBuilder builder,
-            Action<DocumentDbOptions> documentDbOptions)
-            where TRole : IdentityRole
-            where TUser : IdentityUser
+            Action<DocDbIdentity.DocumentDbOptions> documentDbOptions)
+            where TRole : DocDbIdentity.IdentityRole
+            where TUser : DocDbIdentity.IdentityUser
         {
-            var dbOptions = new DocumentDbOptions();
+            var dbOptions = new DocDbIdentity.DocumentDbOptions();
             documentDbOptions(dbOptions);
 
             if (dbOptions == null)
@@ -92,7 +91,7 @@ namespace Microsoft.Extensions.DependencyInjection
             IDocumentClient documentClient,
             Func<IServiceProvider, DocumentCollection> collectionFactory)
         {
-            return RegisterDocumentDBStores<IdentityUser, IdentityRole>(builder, documentClient, collectionFactory);
+            return RegisterDocumentDBStores<DocDbIdentity.IdentityUser, DocDbIdentity.IdentityRole>(builder, documentClient, collectionFactory);
         }
 
         /// <summary>
@@ -108,8 +107,8 @@ namespace Microsoft.Extensions.DependencyInjection
             this IdentityBuilder builder,
             IDocumentClient documentClient,
             Func<IServiceProvider, DocumentCollection> collectionFactory)
-            where TRole : IdentityRole
-            where TUser : IdentityUser
+            where TRole : DocDbIdentity.IdentityRole
+            where TUser : DocDbIdentity.IdentityUser
         {
             if (typeof(TUser) != builder.UserType)
             {
@@ -126,8 +125,8 @@ namespace Microsoft.Extensions.DependencyInjection
                 throw new ArgumentException(message);
             }
 
-            builder.Services.AddSingleton<IUserStore<TUser>>(p => new UserStore<TUser>(documentClient, collectionFactory(p)));
-            builder.Services.AddSingleton<IRoleStore<TRole>>(p => new RoleStore<TRole>(documentClient, collectionFactory(p)));
+            builder.Services.AddSingleton<IUserStore<TUser>>(p => new DocDbIdentity.UserStore<TUser>(documentClient, collectionFactory(p)));
+            builder.Services.AddSingleton<IRoleStore<TRole>>(p => new DocDbIdentity.RoleStore<TRole>(documentClient, collectionFactory(p)));
 
             return builder;
         }
@@ -141,10 +140,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The <see cref="IdentityBuilder"/> with the DocumentDB settings applied.</returns>
         public static IdentityBuilder AddIdentityWithDocumentDBStores(
             this IServiceCollection service,
-            Action<DocumentDbOptions> documentDbOptions,
+            Action<DocDbIdentity.DocumentDbOptions> documentDbOptions,
             Action<IdentityOptions> identityOptions = null)
         {
-            return service.AddIdentityWithDocumentDBStores<IdentityUser, IdentityRole>(
+            return service.AddIdentityWithDocumentDBStores<DocDbIdentity.IdentityUser, DocDbIdentity.IdentityRole>(
                     documentDbOptions, identityOptions);
         }
 
@@ -160,10 +159,10 @@ namespace Microsoft.Extensions.DependencyInjection
         /// <returns>The <see cref="IdentityBuilder"/> with the DocumentDB settings applied.</returns>
         public static IdentityBuilder AddIdentityWithDocumentDBStores<TUser, TRole>(
             this IServiceCollection service,
-            Action<DocumentDbOptions> documentDbOptions,
+            Action<DocDbIdentity.DocumentDbOptions> documentDbOptions,
             Action<IdentityOptions> identityOptions = null)
-            where TUser : IdentityUser
-            where TRole : IdentityRole
+            where TUser : DocDbIdentity.IdentityUser
+            where TRole : DocDbIdentity.IdentityRole
         {
             return service.AddIdentity<TUser, TRole>(identityOptions)
                 .RegisterDocumentDBStores<TUser, TRole>(documentDbOptions);
@@ -184,8 +183,8 @@ namespace Microsoft.Extensions.DependencyInjection
             IDocumentClient documentClient,
             Func<IServiceProvider, DocumentCollection> collectionFactory,
             Action<IdentityOptions> identityOptions = null)
-            where TUser : IdentityUser
-            where TRole : IdentityRole
+            where TUser : DocDbIdentity.IdentityUser
+            where TRole : DocDbIdentity.IdentityRole
         {
             return service.AddIdentity<TUser, TRole>(identityOptions)
                 .RegisterDocumentDBStores<TUser, TRole>(documentClient, collectionFactory);

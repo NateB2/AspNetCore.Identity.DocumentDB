@@ -1,6 +1,6 @@
 ﻿using AspNetCore.Identity.DocumentDB;
 using IntegrationTests;
-using Microsoft.AspNetCore.Identity.DocumentDB;
+using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
 using Microsoft.Azure.Documents;
 using Microsoft.Azure.Documents.Client;
 using System;
@@ -20,11 +20,11 @@ namespace CoreIntegrationTests
             Paths = new Collection<string> { "/partition" }
         };
 
-        private readonly string userMappingEmailStr = Helper.GetEnumMemberValue(TypeEnum.UserMappingEmail);
+        private readonly string userMappingEmailStr = Helper.GetEnumMemberValue(DocDBIdentity.TypeEnum.UserMappingEmail);
 
-        private readonly string userMappingUsernameStr = Helper.GetEnumMemberValue(TypeEnum.UserMappingUsername);
+        private readonly string userMappingUsernameStr = Helper.GetEnumMemberValue(DocDBIdentity.TypeEnum.UserMappingUsername);
 
-        private readonly string roleMappingStr = Helper.GetEnumMemberValue(TypeEnum.RoleMapping);
+        private readonly string roleMappingStr = Helper.GetEnumMemberValue(DocDBIdentity.TypeEnum.RoleMapping);
 
         public PartitioningTests()
             : base(partitionKey)
@@ -36,8 +36,8 @@ namespace CoreIntegrationTests
             var userManager = GetUserManager();
 
             // create user
-            var user1 = new IdentityUser { UserName = "user1" };
-            var user2 = new IdentityUser { UserName = "user2" };
+            var user1 = new DocDBIdentity.IdentityUser { UserName = "user1" };
+            var user2 = new DocDBIdentity.IdentityUser { UserName = "user2" };
             await userManager.CreateAsync(user1);
             await userManager.CreateAsync(user2);
 
@@ -47,14 +47,14 @@ namespace CoreIntegrationTests
             // 2 documents per user (main document & username mapping, no email mapping because none was given)
             Assert.Equal(4, results.Count);
 
-            var dbUser1 = (IdentityUser)(dynamic)results[0];
+            var dbUser1 = (DocDBIdentity.IdentityUser)(dynamic)results[0];
             Assert.Equal(user1.Id, dbUser1.Id);
             var mappingUsername1 = (dynamic)results[1];
             Assert.Equal(userMappingUsernameStr, mappingUsername1.Id);
             Assert.Equal(dbUser1.NormalizedUserName, mappingUsername1.partition);
             Assert.Equal(dbUser1.Id, mappingUsername1.targetId);
 
-            var dbUser2 = (IdentityUser)(dynamic)results[2];
+            var dbUser2 = (DocDBIdentity.IdentityUser)(dynamic)results[2];
             Assert.Equal(user2.Id, dbUser2.Id);
             var mappingUsername2 = (dynamic)results[3];
             Assert.Equal(userMappingUsernameStr, mappingUsername2.Id);
@@ -72,8 +72,8 @@ namespace CoreIntegrationTests
             var userManager = GetUserManager();
 
             // create user
-            var user1 = new IdentityUser { UserName = "user1", Email = "test1@test.test" };
-            var user2 = new IdentityUser { UserName = "user2", Email = "test2@test.test" };
+            var user1 = new DocDBIdentity.IdentityUser { UserName = "user1", Email = "test1@test.test" };
+            var user2 = new DocDBIdentity.IdentityUser { UserName = "user2", Email = "test2@test.test" };
             await userManager.CreateAsync(user1);
             await userManager.CreateAsync(user2);
 
@@ -81,7 +81,7 @@ namespace CoreIntegrationTests
             var results = Client.CreateDocumentQuery(Users.DocumentsLink, new FeedOptions { EnableCrossPartitionQuery = true }).ToList();
             Assert.Equal(6, results.Count); // 2 documents per user
 
-            var dbUser1 = (IdentityUser)(dynamic)results[0];
+            var dbUser1 = (DocDBIdentity.IdentityUser)(dynamic)results[0];
             Assert.Equal(user1.Id, dbUser1.Id);
             var mappingUsername1 = (dynamic)results[1];
             Assert.Equal(userMappingUsernameStr, mappingUsername1.Id);
@@ -92,7 +92,7 @@ namespace CoreIntegrationTests
             Assert.Equal(dbUser1.NormalizedEmail, mappingEmail1.partition);
             Assert.Equal(dbUser1.Id, mappingEmail1.targetId);
 
-            var dbUser2 = (IdentityUser)(dynamic)results[3];
+            var dbUser2 = (DocDBIdentity.IdentityUser)(dynamic)results[3];
             Assert.Equal(user2.Id, dbUser2.Id);
             var mappingUsername2 = (dynamic)results[4];
             Assert.Equal(userMappingUsernameStr, mappingUsername2.Id);
@@ -114,7 +114,7 @@ namespace CoreIntegrationTests
             var userManager = GetUserManager();
 
             // create user
-            var user1 = new IdentityUser { UserName = "user1", Email = "test1@test.test" };
+            var user1 = new DocDBIdentity.IdentityUser { UserName = "user1", Email = "test1@test.test" };
             await userManager.CreateAsync(user1);
 
             var userFound = await userManager.FindByIdAsync(user1.Id);
@@ -131,7 +131,7 @@ namespace CoreIntegrationTests
             var userManager = GetUserManager();
 
             // create user
-            var user1 = new IdentityUser { UserName = "user1", Email = "test1@test.test" };
+            var user1 = new DocDBIdentity.IdentityUser { UserName = "user1", Email = "test1@test.test" };
             await userManager.CreateAsync(user1);
 
             var userFound = await userManager.FindByNameAsync(user1.UserName);
@@ -148,7 +148,7 @@ namespace CoreIntegrationTests
             var userManager = GetUserManager();
 
             // create user
-            var user1 = new IdentityUser { UserName = "user1", Email = "test1@test.test" };
+            var user1 = new DocDBIdentity.IdentityUser { UserName = "user1", Email = "test1@test.test" };
             await userManager.CreateAsync(user1);
 
             var userFound = await userManager.FindByEmailAsync(user1.Email);
@@ -158,6 +158,5 @@ namespace CoreIntegrationTests
             Assert.Equal(user1.UserName, userFound.UserName);
             Assert.Equal(user1.Email, userFound.Email);
         }
-
     }
 }

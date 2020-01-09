@@ -2,7 +2,7 @@
 {
     using System.Threading.Tasks;
     using IntegrationTests;
-    using Microsoft.AspNetCore.Identity.DocumentDB;
+    using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
     using Xunit;
 
     public class UserAuthenticationTokenStoreTests : UserIntegrationTestsBase
@@ -10,8 +10,8 @@
         [Fact]
         public async Task SetGetAndRemoveTokens()
         {
-            // note: this is just an integration test, testing of IdentityUser behavior is in domain/unit tests
-            var user = new IdentityUser() { UserName = "test" };
+            // note: this is just an integration test, testing of DocDBIdentity.IdentityUser behavior is in domain/unit tests
+            var user = new DocDBIdentity.IdentityUser() { UserName = "test" };
             var manager = GetUserManager();
             await manager.CreateAsync(user);
 

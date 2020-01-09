@@ -3,16 +3,16 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Identity;
-    using Microsoft.AspNetCore.Identity.DocumentDB;
     using Microsoft.Extensions.DependencyInjection;
+    using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
     using Xunit;
-    
+
     public class EnsureWeCanExtendIdentityUserTests : UserIntegrationTestsBase
     {
         private UserManager<ExtendedIdentityUser> _Manager;
         private ExtendedIdentityUser _User;
 
-        public class ExtendedIdentityUser : IdentityUser
+        public class ExtendedIdentityUser : DocDBIdentity.IdentityUser
         {
             public string ExtendedField { get; set; }
         }
@@ -24,7 +24,7 @@
 
         public void BeforeEachTestAfterBase()
         {
-            _Manager = CreateServiceProvider<ExtendedIdentityUser, IdentityRole>()
+            _Manager = CreateServiceProvider<ExtendedIdentityUser, DocDBIdentity.IdentityRole>()
                 .GetService<UserManager<ExtendedIdentityUser>>();
             _User = new ExtendedIdentityUser
             {

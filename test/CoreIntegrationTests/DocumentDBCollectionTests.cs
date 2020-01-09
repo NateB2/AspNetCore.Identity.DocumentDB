@@ -2,9 +2,9 @@
 {
     using System.Linq;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Identity.DocumentDB;
+    using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
     using Xunit;
-    
+
     public class DocumentDBCollectionTests : UserIntegrationTestsBase
     {
         [Fact]
@@ -15,14 +15,14 @@
 
             // create user
             var userName = "admin";
-            var user = new IdentityUser { UserName = userName };
+            var user = new DocDBIdentity.IdentityUser { UserName = userName };
             var userManager = GetUserManager();
 
             await userManager.CreateAsync(user);
 
             // create role
             var roleName = "admin";
-            var role = new IdentityRole(roleName);
+            var role = new DocDBIdentity.IdentityRole(roleName);
             var roleManager = GetRoleManager();
 
             await roleManager.CreateAsync(role);

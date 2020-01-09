@@ -3,7 +3,7 @@
     using System;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Identity;
-    using Microsoft.AspNetCore.Identity.DocumentDB;
+    using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
     using Microsoft.Extensions.DependencyInjection;
     using Xunit;
 
@@ -14,7 +14,7 @@
         public async Task AccessFailed_IncrementsAccessFailedCount()
         {
             var manager = GetUserManagerWithThreeMaxAccessAttempts();
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
 
             await manager.AccessFailedAsync(user);
@@ -22,10 +22,10 @@
             Assert.Equal(1, await manager.GetAccessFailedCountAsync(user));
         }
 
-        private UserManager<IdentityUser> GetUserManagerWithThreeMaxAccessAttempts()
+        private UserManager<DocDBIdentity.IdentityUser> GetUserManagerWithThreeMaxAccessAttempts()
         {
-            return CreateServiceProvider<IdentityUser, IdentityRole>(options => options.Lockout.MaxFailedAccessAttempts = 3)
-                .GetService<UserManager<IdentityUser>>();
+            return CreateServiceProvider<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>(options => options.Lockout.MaxFailedAccessAttempts = 3)
+                .GetService<UserManager<DocDBIdentity.IdentityUser>>();
         }
 
         [Fact]
@@ -33,7 +33,7 @@
         {
             /* TODO
 			var store = new UserStore<IdentityUser>(documentClient, null);
-			var user = new IdentityUser {UserName = "bob"};
+			var user = new DocDBIdentity.IdentityUser {UserName = "bob"};
 
 			var count = store.IncrementAccessFailedCountAsync(user, default(CancellationToken));
 
@@ -45,7 +45,7 @@
         public async Task ResetAccessFailed_AfterAnAccessFailed_SetsToZero()
         {
             var manager = GetUserManagerWithThreeMaxAccessAttempts();
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
             await manager.AccessFailedAsync(user);
 
@@ -58,7 +58,7 @@
         public async Task AccessFailed_NotOverMaxFailures_NoLockoutEndDate()
         {
             var manager = GetUserManagerWithThreeMaxAccessAttempts();
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
 
             await manager.AccessFailedAsync(user);
@@ -69,14 +69,14 @@
         [Fact]
         public async Task AccessFailed_ExceedsMaxFailedAccessAttempts_LocksAccount()
         {
-            var manager = CreateServiceProvider<IdentityUser, IdentityRole>(options =>
-                {
-                    options.Lockout.MaxFailedAccessAttempts = 0;
-                    options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(1);
-                })
-                .GetService<UserManager<IdentityUser>>();
+            var manager = CreateServiceProvider<DocDBIdentity.IdentityUser, DocDBIdentity.IdentityRole>(options =>
+                 {
+                     options.Lockout.MaxFailedAccessAttempts = 0;
+                     options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromHours(1);
+                 })
+                .GetService<UserManager<DocDBIdentity.IdentityUser>>();
 
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
 
             await manager.AccessFailedAsync(user);
@@ -89,7 +89,7 @@
         public async Task SetLockoutEnabled()
         {
             var manager = GetUserManager();
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
 
             await manager.SetLockoutEnabledAsync(user, true);

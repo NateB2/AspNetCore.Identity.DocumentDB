@@ -3,7 +3,7 @@
     using System.Linq;
     using System.Threading.Tasks;
     using Microsoft.AspNetCore.Identity;
-    using Microsoft.AspNetCore.Identity.DocumentDB;
+    using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
     using Xunit;
 
     // todo low - validate all tests work
@@ -14,12 +14,12 @@
         {
             var manager = GetUserManager();
             var login = new UserLoginInfo("provider", "key", "name");
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
 
             await manager.AddLoginAsync(user, login);
 
-            var savedLogin = Client.CreateDocumentQuery<IdentityUser>(Users.DocumentsLink).AsEnumerable().FirstOrDefault().Logins.Single();
+            var savedLogin = Client.CreateDocumentQuery<DocDBIdentity.IdentityUser>(Users.DocumentsLink).AsEnumerable().FirstOrDefault().Logins.Single();
             Assert.Equal("provider", savedLogin.LoginProvider);
             Assert.Equal("key", savedLogin.ProviderKey);
             Assert.Equal("name", savedLogin.ProviderDisplayName);
@@ -30,13 +30,13 @@
         {
             var manager = GetUserManager();
             var login = new UserLoginInfo("provider", "key", "name");
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
             await manager.AddLoginAsync(user, login);
 
             await manager.RemoveLoginAsync(user, login.LoginProvider, login.ProviderKey);
 
-            var savedUser = Client.CreateDocumentQuery<IdentityUser>(Users.DocumentsLink).AsEnumerable().FirstOrDefault();
+            var savedUser = Client.CreateDocumentQuery<DocDBIdentity.IdentityUser>(Users.DocumentsLink).AsEnumerable().FirstOrDefault();
             Assert.Empty(savedUser.Logins);
         }
 
@@ -45,7 +45,7 @@
         {
             var manager = GetUserManager();
             var login = new UserLoginInfo("provider", "key", "name");
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
             await manager.AddLoginAsync(user, login);
 
@@ -62,7 +62,7 @@
         {
             var manager = GetUserManager();
             var login = new UserLoginInfo("provider", "key", "name");
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
             await manager.AddLoginAsync(user, login);
 
@@ -76,7 +76,7 @@
         {
             var manager = GetUserManager();
             var login = new UserLoginInfo("provider", "key", "name");
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
             await manager.AddLoginAsync(user, login);
 
@@ -90,7 +90,7 @@
         {
             var manager = GetUserManager();
             var login = new UserLoginInfo("provider", "key", "name");
-            var user = new IdentityUser { UserName = "bob" };
+            var user = new DocDBIdentity.IdentityUser { UserName = "bob" };
             await manager.CreateAsync(user);
             await manager.AddLoginAsync(user, login);
 

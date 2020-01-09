@@ -2,22 +2,22 @@
 {
     using System.Linq;
     using System.Threading.Tasks;
-    using Microsoft.AspNetCore.Identity.DocumentDB;
+    using DocDBIdentity = Microsoft.AspNetCore.Identity.DocumentDB;
     using Xunit;
     using System;
-    
+
     public class RoleStoreTests : UserIntegrationTestsBase
     {
         [Fact]
         public async Task Create_NewRole_Saves()
         {
             var roleName = "admin";
-            var role = new IdentityRole(roleName);
+            var role = new DocDBIdentity.IdentityRole(roleName);
             var manager = GetRoleManager();
 
             await manager.CreateAsync(role);
 
-            var savedRole = Client.CreateDocumentQuery<IdentityRole>(Roles.DocumentsLink).AsEnumerable().FirstOrDefault();
+            var savedRole = Client.CreateDocumentQuery<DocDBIdentity.IdentityRole>(Roles.DocumentsLink).AsEnumerable().FirstOrDefault();
             Assert.Equal(roleName, savedRole.Name);
             Assert.Equal("ADMIN", savedRole.NormalizedName);
         }
@@ -26,7 +26,7 @@
         public async Task FindByName_SavedRole_ReturnsRole()
         {
             var roleName = "name";
-            var role = new IdentityRole { Name = roleName };
+            var role = new DocDBIdentity.IdentityRole { Name = roleName };
             var manager = GetRoleManager();
             await manager.CreateAsync(role);
 
@@ -41,7 +41,7 @@
         public async Task FindById_SavedRole_ReturnsRole()
         {
             var roleId = Guid.NewGuid().ToString();
-            var role = new IdentityRole { Name = "name" };
+            var role = new DocDBIdentity.IdentityRole { Name = "name" };
             role.Id = roleId;
             var manager = GetRoleManager();
             await manager.CreateAsync(role);
@@ -55,20 +55,20 @@
         [Fact]
         public async Task Delete_ExistingRole_Removes()
         {
-            var role = new IdentityRole { Name = "name" };
+            var role = new DocDBIdentity.IdentityRole { Name = "name" };
             var manager = GetRoleManager();
             await manager.CreateAsync(role);
-            Assert.NotEmpty(Client.CreateDocumentQuery<IdentityRole>(Roles.DocumentsLink).AsEnumerable());
+            Assert.NotEmpty(Client.CreateDocumentQuery<DocDBIdentity.IdentityRole>(Roles.DocumentsLink).AsEnumerable());
 
             await manager.DeleteAsync(role);
 
-            Assert.Empty(Client.CreateDocumentQuery<IdentityRole>(Roles.DocumentsLink).AsEnumerable());
+            Assert.Empty(Client.CreateDocumentQuery<DocDBIdentity.IdentityRole>(Roles.DocumentsLink).AsEnumerable());
         }
 
         [Fact]
         public async Task Update_ExistingRole_Updates()
         {
-            var role = new IdentityRole { Name = "name" };
+            var role = new DocDBIdentity.IdentityRole { Name = "name" };
             var manager = GetRoleManager();
             await manager.CreateAsync(role);
             var savedRole = await manager.FindByIdAsync(role.Id);
@@ -76,7 +76,7 @@
 
             await manager.UpdateAsync(savedRole);
 
-            var changedRole = Client.CreateDocumentQuery<IdentityRole>(Roles.DocumentsLink).AsEnumerable().FirstOrDefault();
+            var changedRole = Client.CreateDocumentQuery<DocDBIdentity.IdentityRole>(Roles.DocumentsLink).AsEnumerable().FirstOrDefault();
             Assert.NotNull(changedRole);
             Assert.Equal("newname", changedRole.Name);
         }
@@ -84,7 +84,7 @@
         [Fact]
         public async Task SimpleAccessorsAndGetters()
         {
-            var role = new IdentityRole
+            var role = new DocDBIdentity.IdentityRole
             {
                 Name = "name"
             };
