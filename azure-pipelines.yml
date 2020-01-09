@@ -9,7 +9,7 @@ resources:
   repositories:
     - repository: templates
       type: git
-      name: sureid_shared_libraries/YamlTemplates
+      name: sureid_shared_libraries/DevOpsTemplates
 
 name: $(MajorVersion).$(MinorVersion).$(Year:yy)$(DayOfYear).$(Build.BuildId)
 
@@ -21,12 +21,14 @@ steps:
 - checkout: self
   clean: true
 
-- template: build/DotNetCore-RestoreNugetPackages.yaml@templates
+- template: build/dotNetCore-InstallAndUse.yaml@templates
 
-- template: build/DotNetCore22-BuildAndTest.yaml@templates
+- template: build/dotNetCore-RestoreNugetPackages.yaml@templates
+
+- template: build/dotNetCore-BuildAndTest.yaml@templates
   parameters:
-    buildConfiguration: '$(BuildConfiguration)'
-    dotNetTestArguments: '--configuration $(BuildConfiguration) --collect "Code Coverage"'
+    buildConfiguration: $(BuildConfiguration)
+    dotNetTestArguments: '--configuration $(BuildConfiguration)'
 
 - task: PublishSymbols@2
   displayName: 'Publish symbols'
